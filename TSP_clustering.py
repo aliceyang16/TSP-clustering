@@ -125,13 +125,13 @@ def getHierarchialSolution(route, distanceMatrix, label):
 			start_node = current_leaf[0]
 			end_node = current_leaf[len(current_leaf) - 1]
 
-			start_distance_first = {
-				"city": start_node,
-				"paired_cities":current_leaf[1:],
-				"cities": current_leaf,
-				"distance": distanceMatrix[leaf_node_first][start_node],
-				"entry" : True
-			}
+			# start_distance_first = {
+			# 	"city": start_node,
+			# 	"paired_cities":current_leaf[1:],
+			# 	"cities": current_leaf,
+			# 	"distance": distanceMatrix[leaf_node_first][start_node],
+			# 	"entry" : True
+			# }
 
 			start_distance_second = {
 				"city": start_node,
@@ -140,16 +140,16 @@ def getHierarchialSolution(route, distanceMatrix, label):
 				"distance": distanceMatrix[leaf_node_second][start_node],
 				"entry": False
 			}
-			distances.append(start_distance_first)
+			# distances.append(start_distance_first)
 			distances.append(start_distance_second)
 
-			end_distance_first = {
-				"city": end_node,
-				"paired_cities": list(reversed(current_leaf[:len(current_leaf)-1])),
-				"cities": current_leaf,
-				"distance": distanceMatrix[leaf_node_first][end_node],
-				"entry": True
-			}
+			# end_distance_first = {
+			# 	"city": end_node,
+			# 	"paired_cities": list(reversed(current_leaf[:len(current_leaf)-1])),
+			# 	"cities": current_leaf,
+			# 	"distance": distanceMatrix[leaf_node_first][end_node],
+			# 	"entry": True
+			# }
 
 			end_distance_second = {
 				"city": end_node,
@@ -158,7 +158,7 @@ def getHierarchialSolution(route, distanceMatrix, label):
 				"distance": distanceMatrix[leaf_node_second][end_node],
 				"entry": False
 			}
-			distances.append(end_distance_first)
+			# distances.append(end_distance_first)
 			distances.append(end_distance_second)
 		distances.sort(key=lambda x: x.get('distance'))
 		#print(distances)
@@ -172,7 +172,6 @@ def getHierarchialSolution(route, distanceMatrix, label):
 			index = len(visited_leaf) - 1
 			for element in current_visited:
 				visited_leaf.insert(index, element)
-				#index-=1
 		print(visited_leaf)
 		route.remove(distances[0]["cities"])
 
