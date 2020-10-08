@@ -117,6 +117,7 @@ def calculateDistanceTravelled(visited, distanceMatrix):
 def getHierarchialSolution(route, distanceMatrix, label):
 	visited_leaf = route[0]
 	route.remove(visited_leaf)
+
 	while len(visited_leaf) is not len(label):
 		distances = []
 		leaf_node_first = visited_leaf[0]
@@ -160,19 +161,14 @@ def getHierarchialSolution(route, distanceMatrix, label):
 			}
 			# distances.append(end_distance_first)
 			distances.append(end_distance_second)
+
 		distances.sort(key=lambda x: x.get('distance'))
 		#print(distances)
 		current_visited = [distances[0]["city"]]
 		current_visited.extend(distances[0]["paired_cities"])
 
-		if not distances[0]["entry"]:
-			visited_leaf.extend(current_visited)
-		else:
-			# insert cluster before the last visited cluster
-			index = len(visited_leaf) - 1
-			for element in current_visited:
-				visited_leaf.insert(index, element)
-		print(visited_leaf)
+		visited_leaf.extend(current_visited)
+
 		route.remove(distances[0]["cities"])
 
 	visited_leaf.append(visited_leaf[0])
@@ -244,7 +240,7 @@ def clusterCheck(first_value, second_value, index, Z, label, true_index_list):
 
 
 if __name__ == '__main__':
-	filename = 'Problems/lau15_xy.txt'
+	filename = 'Problems/tsp225.txt'
 	label, x, y = getTSPpoints(filename)
 	plotTSPMap(x, y, label)
 	cities = getCities(filename)
@@ -279,13 +275,13 @@ if __name__ == '__main__':
 	
 	#original_route = unique(original_route)
 	#print(original_route)
-	plotClusterRoute(x, y, label, original_route)
+	#plotClusterRoute(x, y, label, original_route)
 	route = original_route.copy()
 	# reverse_route = [x for x in original_route[::-1]]
 
 	visited_leaf = getHierarchialSolution(route, distanceMatrix, label)
 	visited_leaf_distance = calculateDistanceTravelled(visited_leaf, distanceMatrix)
-	#print(visited_leaf_distance)
+	print(visited_leaf_distance)
 	plotRouteSolution(x, y, label, visited_leaf)
 
 	# reverse_visited_leaf = getHierarchialSolution(reverse_route, distanceMatrix, label)
