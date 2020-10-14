@@ -1,0 +1,124 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% witseiepaper-2005.tex
+%
+%                       Ken Nixon (12 October 2005)
+%
+%                       Sample Paper for ELEN417/455 2005
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[10pt,twocolumn]{witseiepaper}
+
+%
+% All KJN's macros and goodies (some shameless borrowing from SPL)
+\usepackage{KJN}
+
+%
+% PDF Info
+%
+\ifpdf
+\pdfinfo{
+/Title (INSTRUCTIONS AND STYLE GUIDELINES FOR THE PREPARATION OF FINAL YEAR LABORATORY PROJECT PAPERS : 2005 VERSION)
+/Author (Ken J Nixon)
+/CreationDate (D:200309251200)
+/ModDate (D:200510121530)
+/Subject (ELEN417/455 Paper Format, 2005)
+/Keywords (ELEN417, ELEN455, paper, instructions, style guidelines, laboratory project)
+}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+
+\title{Hierarchical clustering for solving Travelling Salesman Problem}
+
+\author{Alice Y. Yang
+\thanks{School of Electrical \& Information Engineering, University of the
+Witwatersrand, Private Bag 3, 2050, Johannesburg, South Africa}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\abstract{The purpose of this document is to provide an easy-to-use
+template/style sheet to enable authors to prepare papers in the correct format
+and style for the final year laboratory project. This document may be
+downloaded from the School of Electrical and Information Engineering web site
+and can be used as a template. To ensure conformity of appearance it is
+essential that these instructions are followed. The abstract should be limited
+to 50-200 words, which should concisely summarise the paper.}
+
+\keywords{Four to six key words in alphabetical order, separated by commas.}
+
+
+\maketitle
+\thispagestyle{empty}\pagestyle{empty}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\section{INTRODUCTION}
+
+This document is a ``template'' for \LaTeX. An electronic version of this
+document is available in MS Word, LaTeX or PDF format to use as a template at
+http://school.eie.wits.ac.za/elen417.  In \LaTeX, type over the sections of
+this document or use the included style files with your own source document.
+
+The length of the finished paper should not exceed 6 pages of A4 size paper. Do
+not change the font sizes or line spacing to squeeze more text into this page
+limit. Use {\sl italics} for emphasis; do not underline.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\section{Literature Review}
+Solutions
+
+\begin{table}[h]
+	\begin{tabular}{| c | c | c | c |}
+		\hline
+		\textbf{P} & \textbf{Optimal} & \textbf{Hierarchical clustering} & \textbf{Lower tier clustered} \\
+		\hline
+		att48 & 33522.0 & 41328.0 & 41131.0\\
+		eil51 & 426 & 531.0 & 544.0 \\
+		berlin52 & 7542.0 & 9413.0 & 9930.0 \\
+		st70 & 675 & 847.0 & \\
+		eil76 & 538 & 685.0 & \\
+		sgb128 &  & 24376.0 & \\
+		tsp225 & & 5150.0 & \\
+		\hline
+	\end{tabular}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\section{CONCLUSION}
+
+A conclusion may review the main points of the paper, but do not replicate the
+abstract as the conclusion.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%\nocite{*}
+\bibliographystyle{witseie}
+\bibliography{sample}
+
+%{\tiny \vfill \hfill \today \hspace{5mm} witseie-paper-2003.\TeX}
+
+\end{document}
+
+" vim: ts=4
+" vim: tw=78
+" vim: autoindent
+" vim: shiftwidth=4

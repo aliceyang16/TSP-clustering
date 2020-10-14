@@ -1,27 +1,9 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
-import csv
 import math
-
+import pandas as pd
 import scipy.cluster.hierarchy as sch
-
-def writeToCSV(filename):
-	fields = ['n', 'x', 'y']
-	allData = []
-	with open(filename+'.csv', 'w', newline='') as file:
-		csvwriter = csv.writer(file)
-		csvwriter.writerow(fields)
-		with open(filename+'.txt') as input:
-			for l in input:
-				line = l.split(' ')
-				if line[0] is not '#':
-					data = [float(line[0]), float(line[1]), float(line[2])]
-					allData.append(data)
-		input.close()
-		csvwriter.writerows(allData)
-	file.close()
 
 def getTSPpoints(filename):
 	label = []
@@ -83,6 +65,15 @@ def getDistanceMatrix(cities):
 			distanceMatrix[i][j] = distance
 	return distanceMatrix
 
+def calculateDistanceTravelled(visited, distanceMatrix):
+		totalDistance = 0
+		previous_state = visited[0] 
+		for city in visited:
+			current_sate = city
+			totalDistance += distanceMatrix[previous_state][current_sate]
+			previous_state = current_sate
+		return totalDistance
+
 def getLeafMinDistance(leaf, new_leaf, distanceMatrix):
 	distances = []
 	index = 0
@@ -97,22 +88,71 @@ def getLeafMinDistance(leaf, new_leaf, distanceMatrix):
 	distances.sort(key=lambda x: x.get('distance'))
 	return distances[0]["index"]
 
-def unique(routes):
-	unique_routes = []
-	unique_routes_set = set(routes)
+def combineLeaves(leaf1, leaf2, distanceMatrix):
+	leaf1_start = leaf1[0]
+	leaf1_end = leaf1[len(leaf1) - 1]
+	leaf2_start = leaf2[0]
+	leaf2_end = leaf2[len(leaf2) - 1]
 
-	for route in unique_routes_set:
-		unique_routes.append(route)
-	return unique_routes
+	distance1 = distanceMatrix[leaf1_start][leaf2_start]
+	distance2 = distanceMatrix[leaf1_start][leaf2_end]
+	distance3 = distanceMatrix[leaf1_end][leaf2_start]
+	distance4 = distanceMatrix[leaf1_end][leaf2_end]
 
-def calculateDistanceTravelled(visited, distanceMatrix):
-		totalDistance = 0
-		previous_state = visited[0] 
-		for city in visited:
-			current_sate = city
-			totalDistance += distanceMatrix[previous_state][current_sate]
-			previous_state = current_sate
-		return totalDistance
+	distances = [distance1, distance2, distance3, distance4]
+	minDistance = min(distances)
+	index = distances.index(minDistance)
+
+	if index == 0:
+		new_leaf_route = leaf2[::-1].copy()
+		new_leaf_route.extend(leaf1)
+	elif index == 1:
+		new_leaf_route = leaf2.copy()
+		leaf1 = leaf1[::-1].copy()
+		new_leaf_route.extend(leaf1)
+	elif index == 2:
+		new_leaf_route = leaf1.copy()
+		new_leaf_route.extend(leaf2)
+	else:
+		new_leaf_route = leaf1.copy()
+		leaf2 = leaf2[::-1].copy()
+		new_leaf_route.extend(leaf2)
+
+	return new_leaf_route
+
+def clusterCheck(first_value, second_value, index, Z, label, true_index_list):
+	if first_value < len(label) and second_value >= len(label):
+		index = second_value % len(label)
+		cluster = Z[index]
+		return clusterCheck(int(cluster[0]), int(cluster[1]), index, Z, label, true_index_list)
+	elif first_value >= len(label) and second_value < len(label):
+		index = first_value % len(label)
+		cluster = Z[index]
+		return clusterCheck(int(cluster[0]), int(cluster[1]), index, Z, label, true_index_list)
+	else:
+		if first_value >= len(label) and second_value >= len(label):
+			index = first_value % len(label)
+			cluster = Z[index]
+			return clusterCheck(int(cluster[0]), int(cluster[1]), index, Z, label, true_index_list)
+		else:
+			true_index = true_index_list.index(index)
+			return true_index
+
+def pairClusters(route_id, original_route, hierarchy, distanceMatrix):
+	grown_leaves = []
+	for cluster in hierarchy:
+		if int(cluster[0]) in route_id:
+			if int(cluster[1]) in route_id:
+				leaf1 = original_route[route_id.index(int(cluster[0]))]
+				leaf2 = original_route[route_id.index(int(cluster[1]))]
+				new_leaf = combineLeaves(leaf1, leaf2, distanceMatrix)
+				original_route.append(new_leaf)
+				grown_leaves.append(leaf1)
+				original_route.remove(leaf2)
+				route_id.remove(int(cluster[1]))
+
+	for leaf in grown_leaves:
+		original_route.remove(leaf)
 
 def getHierarchialSolution(route, distanceMatrix, label):
 	visited_leaf = route[0]
@@ -221,72 +261,52 @@ def plotClusterRoute(x, y, label, routes):
 	                 ha='center') # horizontal alignment can be left, right or center
 	plt.show()
 
-
-def clusterCheck(first_value, second_value, index, Z, label, true_index_list):
-	if first_value < len(label) and second_value >= len(label):
-		index = second_value % len(label)
-		cluster = Z[index]
-		return clusterCheck(int(cluster[0]), int(cluster[1]), index, Z, label, true_index_list)
-	elif first_value >= len(label) and second_value < len(label):
-		index = first_value % len(label)
-		cluster = Z[index]
-		return clusterCheck(int(cluster[0]), int(cluster[1]), index, Z, label, true_index_list)
-	else:
-		if first_value >= len(label) and second_value >= len(label):
-			index = first_value % len(label)
-			cluster = Z[index]
-			return clusterCheck(int(cluster[0]), int(cluster[1]), index, Z, label, true_index_list)
-		else:
-			true_index = true_index_list.index(index)
-			return true_index
-
-# Clusters on the lowest tier of points
 if __name__ == '__main__':
-	filename = 'Problems/lau15_xy.txt'
+	filename = 'Problems/berlin52.txt'
 	label, x, y = getTSPpoints(filename)
 	plotTSPMap(x, y, label)
 	cities = getCities(filename)
 	distanceMatrix = getDistanceMatrix(cities)
-	#print(distanceMatrix)
 
+	# Hierarchical clustering
 	filename = os.path.splitext(filename)[0]
 	dataset = pd.read_csv(filename+'.csv')
 	X = dataset.iloc[:, [1,2]].values
+	Z = sch.linkage(X, 'ward')
 
 	original_route = []
 	true_index_list = []
-	counter = 0
-	Z = sch.linkage(X, 'ward')
+	route_id = []
+	counter = 0  
 	for cluster in Z:
 		if cluster[0] < len(label) and cluster[1] < len(label):
 			leaf = [int(cluster[0]), int(cluster[1])]
 			original_route.append(leaf)
+			route_id.append(len(Z) + counter + 1)
 			true_index_list.append(counter)
 		else:
 			if cluster[0] < len(label):
 				index = clusterCheck(int(cluster[0]), int(cluster[1]), 0, Z, label, true_index_list)
 				position = getLeafMinDistance(original_route[index], int(cluster[0]), distanceMatrix)
 				original_route[index].insert(position, int(cluster[0]))
+				IDindex = route_id.index(int(cluster[1]))
+				route_id[IDindex] = len(Z) + counter + 1
 
 			if cluster[1] < len(label):
 				index = clusterCheck(int(cluster[0]), int(cluster[1]), 0, Z, label, true_index_list)
 				position = getLeafMinDistance(original_route[index], int(cluster[1]), distanceMatrix)
 				original_route[index].insert(position, int(cluster[1]))
+				IDindex = route_id.index(int(cluster[0]))
+				route_id[IDindex] = len(Z) + counter + 1
 				# original_route.append(original_route[index])
 		counter += 1
-	
-	#original_route = unique(original_route)
-	#print(original_route)
-	#plotClusterRoute(x, y, label, original_route)
-	route = original_route.copy()
-	# reverse_route = [x for x in original_route[::-1]]
 
+	plotClusterRoute(x, y, label, original_route )
+	#print(original_route)
+	pairClusters(route_id, original_route, Z, distanceMatrix)
+	route = original_route.copy()
 	visited_leaf = getHierarchialSolution(route, distanceMatrix, label)
 	visited_leaf_distance = calculateDistanceTravelled(visited_leaf, distanceMatrix)
+	#print(visited_leaf)
 	print(visited_leaf_distance)
 	plotRouteSolution(x, y, label, visited_leaf)
-
-	# reverse_visited_leaf = getHierarchialSolution(reverse_route, distanceMatrix, label)
-	# reverse_visited_leaf_distance = calculateDistanceTravelled(reverse_visited_leaf, distanceMatrix)
-	# print(reverse_visited_leaf)
-	# plotRouteSolution(x, y, label, reverse_visited_leaf)

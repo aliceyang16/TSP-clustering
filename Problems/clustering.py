@@ -37,7 +37,7 @@ def plotCluster(X):
 	plt.show()
 
 if __name__ == '__main__':
-	filename = 'Problems/eil51'
+	filename = 'eil51'
 	writeToCSV(filename)
 
 	dataset = pd.read_csv(filename+'.csv')
