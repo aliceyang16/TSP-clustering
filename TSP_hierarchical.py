@@ -138,8 +138,19 @@ def clusterCheck(first_value, second_value, index, Z, label, true_index_list):
 			true_index = true_index_list.index(index)
 			return true_index
 
+def IDCheck(clusterID, Z, route_id):
+	try:
+		indexID = route_id.index(clusterID)
+	except:
+		index = clusterID % len(Z)
+		sub_cluster = int(Z[index][1])
+		return IDCheck(sub_cluster, Z, route_id)
+	else:
+		return indexID
+
 def pairClusters(route_id, original_route, hierarchy, distanceMatrix):
-	grown_leaves = []
+	counter = 0
+	new_route_id = []
 	for cluster in hierarchy:
 		if int(cluster[0]) in route_id:
 			if int(cluster[1]) in route_id:
@@ -147,12 +158,14 @@ def pairClusters(route_id, original_route, hierarchy, distanceMatrix):
 				leaf2 = original_route[route_id.index(int(cluster[1]))]
 				new_leaf = combineLeaves(leaf1, leaf2, distanceMatrix)
 				original_route.append(new_leaf)
-				grown_leaves.append(leaf1)
+				new_route_id.append(len(hierarchy) + counter + 1)
+				original_route.remove(leaf1)
 				original_route.remove(leaf2)
+				route_id.remove(int(cluster[0]))
 				route_id.remove(int(cluster[1]))
+		counter += 1
+	route_id.extend(new_route_id)
 
-	for leaf in grown_leaves:
-		original_route.remove(leaf)
 
 def getHierarchialSolution(route, distanceMatrix, label):
 	visited_leaf = route[0]
@@ -261,8 +274,16 @@ def plotClusterRoute(x, y, label, routes):
 	                 ha='center') # horizontal alignment can be left, right or center
 	plt.show()
 
+def readSolutionPoints(filename):
+	solution = []
+	with open(filename) as input:
+		for line in input:
+			solution.append(int(line) - 1)
+	return solution
+
 if __name__ == '__main__':
-	filename = 'Problems/berlin52.txt'
+	filename = 'Problems/att48.txt'
+	solution_filename = 'Optimal_Solutions/att48_s.txt'
 	label, x, y = getTSPpoints(filename)
 	plotTSPMap(x, y, label)
 	cities = getCities(filename)
@@ -289,24 +310,46 @@ if __name__ == '__main__':
 				index = clusterCheck(int(cluster[0]), int(cluster[1]), 0, Z, label, true_index_list)
 				position = getLeafMinDistance(original_route[index], int(cluster[0]), distanceMatrix)
 				original_route[index].insert(position, int(cluster[0]))
-				IDindex = route_id.index(int(cluster[1]))
+				IDindex = IDCheck(int(cluster[1]), Z, route_id)
 				route_id[IDindex] = len(Z) + counter + 1
 
 			if cluster[1] < len(label):
 				index = clusterCheck(int(cluster[0]), int(cluster[1]), 0, Z, label, true_index_list)
 				position = getLeafMinDistance(original_route[index], int(cluster[1]), distanceMatrix)
 				original_route[index].insert(position, int(cluster[1]))
-				IDindex = route_id.index(int(cluster[0]))
+				IDindex = IDCheck(int(cluster[0]), Z, route_id)
 				route_id[IDindex] = len(Z) + counter + 1
 				# original_route.append(original_route[index])
 		counter += 1
-
+	print(route_id)
 	plotClusterRoute(x, y, label, original_route )
+	print("original_route = ", original_route)
+
+	# Compare cluster leaf sequence to optimal solution
+	solution = readSolutionPoints(solution_filename)
+	print("solution = ", solution)
+	leaves_found = []
+	for leaf in original_route:
+		found = 0
+		index = solution.index(leaf[0])
+		if leaf == solution[index:index+len(leaf)]:
+			found = 1
+		else:
+			index = solution.index(leaf[::-1][0])
+			if leaf[::-1] == solution[index:index+len(leaf)]:
+				found = 1
+
+		leaves_found.append(found)
+	print(leaves_found)
+
 	#print(original_route)
-	pairClusters(route_id, original_route, Z, distanceMatrix)
-	route = original_route.copy()
-	visited_leaf = getHierarchialSolution(route, distanceMatrix, label)
-	visited_leaf_distance = calculateDistanceTravelled(visited_leaf, distanceMatrix)
-	#print(visited_leaf)
-	print(visited_leaf_distance)
-	plotRouteSolution(x, y, label, visited_leaf)
+	# for i in range(7):
+	# 	pairClusters(route_id, original_route, Z, distanceMatrix)
+	# print(original_route)
+	# print(route_id)
+	# route = original_route.copy()
+	# visited_leaf = getHierarchialSolution(route, distanceMatrix, label)
+	# visited_leaf_distance = calculateDistanceTravelled(visited_leaf, distanceMatrix)
+	# #print(visited_leaf)
+	# print(visited_leaf_distance)
+	# plotRouteSolution(x, y, label, visited_leaf)

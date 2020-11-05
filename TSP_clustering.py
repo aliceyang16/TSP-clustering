@@ -242,7 +242,7 @@ def clusterCheck(first_value, second_value, index, Z, label, true_index_list):
 
 # Clusters on the lowest tier of points
 if __name__ == '__main__':
-	filename = 'Problems/lau15_xy.txt'
+	filename = 'Problems/att6.txt'
 	label, x, y = getTSPpoints(filename)
 	plotTSPMap(x, y, label)
 	cities = getCities(filename)
